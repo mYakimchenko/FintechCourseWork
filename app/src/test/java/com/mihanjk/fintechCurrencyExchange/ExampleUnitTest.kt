@@ -1,4 +1,4 @@
-package com.mihanjk.fintechhomework
+package com.mihanjk.fintechCurrencyExchange
 
 import org.junit.Assert.assertEquals
 import org.junit.Test

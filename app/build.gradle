@@ -1,8 +1,7 @@
 apply plugin: 'com.android.application'
-
 apply plugin: 'kotlin-android'
-
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 26
@@ -23,13 +22,56 @@ android {
     }
 }
 
+ext {
+    dagger_version = "2.11"
+    retrofit_version = "2.3.0"
+    support_version = "26.1.0"
+    rxbinding_version = "2.0.0"
+    room_version = "1.0.0-rc1"
+    moxy_version = "1.5.3"
+}
+
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+
+    // Rx
+    implementation "io.reactivex.rxjava2:rxkotlin:2.1.0"
+    implementation "io.reactivex.rxjava2:rxandroid:2.0.1"
+
+    // RxBinding
+    implementation "com.jakewharton.rxbinding2:rxbinding-kotlin:$rxbinding_version"
+    implementation "com.jakewharton.rxbinding2:rxbinding-design-kotlin:$rxbinding_version"
+    implementation "com.jakewharton.rxbinding2:rxbinding-recyclerview-v7-kotlin:$rxbinding_version"
+
+    // Support
+    implementation "com.android.support:design:$support_version"
+    implementation "com.android.support:appcompat-v7:$support_version"
+
+    // Moxy
+//    implementation "com.arello-mobile:moxy:$moxy_version"
+//    implementation "com.arello-mobile:moxy-app-compat:$moxy_version"
+//    implementation 'com.android.support:support-v4:26.1.0'
+//    implementation 'com.android.support:recyclerview-v7:26.1.0'
+//    kapt "com.arello-mobile:moxy-compiler:$moxy_version"
+
+    // Retrofit
+    implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
+    implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofit_version"
+
+    // Room
+//    implementation "android.arch.persistence.room:runtime:$room_version"
+//    implementation "android.arch.persistence.room:rxjava2:$room_version"
+//    kapt "android.arch.persistence.room:compiler:$room_version"
+
+    // Dagger
+    implementation "com.google.dagger:dagger:$dagger_version"
+    kapt "com.google.dagger:dagger-compiler:$dagger_version"
+
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
     testImplementation 'junit:junit:4.12'
     androidTestImplementation('com.android.support.test.espresso:espresso-core:3.0.1', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    implementation"org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
 }
