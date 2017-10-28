@@ -5,12 +5,14 @@ import com.mihanjk.fintechCurrencyExchange.model.data.Foreign
 class StarClickEvent(val base: Foreign, val isFavorite: Boolean)
 
 class StarClickModel() {
-    private lateinit var inProgress: Boolean
-    private lateinit var success: Boolean
+    private var inProgress: Boolean = false
+    private var success: Boolean = false
     private lateinit var errorMessage: String
 
-    private constructor(inProgress: Boolean, success: Boolean, errorMessage: String) {
-
+    private constructor(inProgress: Boolean, success: Boolean, errorMessage: String) : this() {
+        this.inProgress = inProgress
+        this.success = success
+        this.errorMessage = errorMessage
     }
 
     companion object {

@@ -4,4 +4,5 @@
     <string name="exchange">Exchange</string>
     <string name="analysis">Analysis</string>
     <string name="star_image_description">Star image</string>
+    <string name="shared_preferences_key">com.mihanjk.fintechCurrencyExchange.SHARED_PREFERENCES</string>
 </resources>

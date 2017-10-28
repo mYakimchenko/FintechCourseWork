@@ -1,23 +1,39 @@
 package com.mihanjk.fintechCurrencyExchange.view.currencyList
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
+import com.mihanjk.fintechCurrencyExchange.CurrencyApplication
 import com.mihanjk.fintechCurrencyExchange.R
 import com.mihanjk.fintechCurrencyExchange.model.data.Currency
 import com.mihanjk.fintechCurrencyExchange.model.data.ForeignItem
+import javax.inject.Inject
 
-class CurrencyListFragment : Fragment() {
+class CurrencyListFragment : CurrencyRecyclerViewAdapter.OnListItemInteractionListener, Fragment() {
     private var mListener: OnListFragmentInteractionListener? = null
+
+    private lateinit var mAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>
+
+    @Inject
+    lateinit var mSharedPreferences: SharedPreferences
+
+    override fun onStarImageClicked(item: ForeignItem) {
+//        TODO("Is that's a bad idea to use async call apply, cause may be some error and i can't handle it")
+        mSharedPreferences.edit().putBoolean(item.base.toString(), item.isFavorite).apply()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        (activity.application as CurrencyApplication).component.inject(this)
 //        if (arguments != null) {
 //            mColumnCount = arguments.getInt(ARG_COLUMN_COUNT)
 //        }
@@ -32,9 +48,15 @@ class CurrencyListFragment : Fragment() {
             val context = view.context
             view.layoutManager = LinearLayoutManager(context)
             val values = mutableListOf<ForeignItem>()
-            Currency.values().forEach { values.add(ForeignItem(it, true)) }
+            Currency.values().forEach {
+                values.add(ForeignItem(it,
+                        mSharedPreferences.getBoolean(it.toString(), false)))
+            }
+            values.sortByDescending { it.isFavorite }
+            view.addItemDecoration(DividerItemDecoration(context, LinearLayout.VERTICAL))
             view.adapter = CurrencyRecyclerViewAdapter(values,
-                    mListener)
+                    this)
+            mAdapter = view.adapter
         }
         return view
     }

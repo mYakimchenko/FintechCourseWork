@@ -6,4 +6,4 @@ data class Foreign(val base: Currency,
 )
 
 data class ForeignItem(val base: Currency,
-                       val isFavorite: Boolean)
+                       var isFavorite: Boolean)
