@@ -30,7 +30,7 @@ ext {
     retrofit_version = "2.3.0"
     support_version = "26.1.0"
     rxbinding_version = "2.0.0"
-    room_version = "1.0.0-rc1"
+    room_version = "1.0.0"
     moxy_version = "1.5.3"
 }
 
@@ -51,14 +51,6 @@ dependencies {
     implementation "com.android.support:design:$support_version"
     implementation "com.android.support:appcompat-v7:$support_version"
 
-    // Moxy
-
-    //    implementation "com.arello-mobile:moxy:$moxy_version"
-    //    implementation "com.arello-mobile:moxy-app-compat:$moxy_version"
-    //    implementation 'com.android.support:support-v4:26.1.0'
-    //    implementation 'com.android.support:recyclerview-v7:26.1.0'
-    //    kapt "com.arello-mobile:moxy-compiler:$moxy_version"
-
     // Retrofit
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
     implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
@@ -67,6 +59,7 @@ dependencies {
     // Room
     implementation "android.arch.persistence.room:runtime:$room_version"
     implementation "android.arch.persistence.room:rxjava2:$room_version"
+    implementation 'com.android.support:support-v4:26.1.0'
     kapt "android.arch.persistence.room:compiler:$room_version"
 
     // Dagger
@@ -77,4 +70,6 @@ dependencies {
     androidTestImplementation('com.android.support.test.espresso:espresso-core:3.0.1', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
+
+    implementation "com.github.PhilJay:MPAndroidChart:v3.0.2"
 }

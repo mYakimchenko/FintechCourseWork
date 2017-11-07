@@ -8,15 +8,18 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.jakewharton.rxbinding2.view.RxView
 import com.mihanjk.fintechCurrencyExchange.R
-import com.mihanjk.fintechCurrencyExchange.model.data.ForeignItem
+import com.mihanjk.fintechCurrencyExchange.model.CurrencyEntity
+import com.mihanjk.fintechCurrencyExchange.model.data.Currency
 import kotlinx.android.synthetic.main.fragment_currency_item.view.*
 
-class CurrencyRecyclerViewAdapter(private val mValues: List<ForeignItem>,
+class CurrencyRecyclerViewAdapter(val mValues: MutableList<CurrencyEntity>,
                                   private val mListener: OnListItemInteractionListener) :
         RecyclerView.Adapter<CurrencyRecyclerViewAdapter.ViewHolder>() {
 
     interface OnListItemInteractionListener {
-        fun onStarImageClicked(item: ForeignItem)
+        fun onStarImageClicked(item: CurrencyEntity)
+        fun onLongClicked(name: Currency)
+        fun onClicked(name: Currency)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -27,17 +30,32 @@ class CurrencyRecyclerViewAdapter(private val mValues: List<ForeignItem>,
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.mItem = mValues[position]
-        holder.mCurrencyName.text = holder.mItem.base.toString()
+        holder.mCurrencyName.text = holder.mItem.name.toString()
         holder.mStarImage.setImageResource(if (holder.mItem.isFavorite)
             R.drawable.ic_star_black_24dp else R.drawable.ic_star_border_black_24dp)
 
         RxView.clicks(holder.mStarImage).subscribe {
             holder.mItem.isFavorite = !holder.mItem.isFavorite
-            mListener.onStarImageClicked(holder.mItem)
+//            mListener.onStarImageClicked(holder.mItem)
             holder.mStarImage.setImageResource(if (holder.mItem.isFavorite)
                 R.drawable.ic_star_black_24dp else R.drawable.ic_star_border_black_24dp)
-            mValues.indexOfLast { it.isFavorite }
             notifyItemChanged(position)
+            mValues.removeAt(position)
+            val index = mValues.indexOfLast { it.isFavorite }
+                    .let { if (it == -1) 0 else it + 1 }
+            mValues.add(index, holder.mItem)
+            holder.mItem.position = index
+            notifyItemMoved(position, holder.mItem.position)
+            notifyDataSetChanged()
+        }
+
+        RxView.longClicks(holder.mView).subscribe {
+            notifyItemRemoved(position)
+            mListener.onLongClicked(holder.mItem.name)
+        }
+
+        RxView.clicks(holder.mView).subscribe {
+            mListener.onClicked(holder.mItem.name)
         }
     }
 
@@ -45,14 +63,9 @@ class CurrencyRecyclerViewAdapter(private val mValues: List<ForeignItem>,
         return mValues.size
     }
 
-    inner class ViewHolder(mView: View) : RecyclerView.ViewHolder(mView) {
-        lateinit var mItem: ForeignItem
+    inner class ViewHolder(val mView: View) : RecyclerView.ViewHolder(mView) {
+        lateinit var mItem: CurrencyEntity
         val mCurrencyName: TextView = mView.currencyName
         val mStarImage: ImageView = mView.starImage
-
-        init {
-            mStarImage.setOnClickListener { mStarImage.isEnabled = !mStarImage.isEnabled}
-        }
-
     }
 }

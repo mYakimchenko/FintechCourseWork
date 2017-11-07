@@ -8,9 +8,12 @@
 
     <TextView
         android:id="@+id/selectedCurrency"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:text="test" />
+        android:background="@color/colorPrimaryDark"
+        android:paddingLeft="16dp"
+        android:paddingStart="16dp"
+        android:text="@string/current_currency" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/list"
@@ -22,4 +25,5 @@
         app:layoutManager="LinearLayoutManager"
         tools:context="com.mihanjk.fintechCurrencyExchange.view.currencyList.CurrencyListFragment"
         tools:listitem="@layout/fragment_currency_item" />
+
 </RelativeLayout>

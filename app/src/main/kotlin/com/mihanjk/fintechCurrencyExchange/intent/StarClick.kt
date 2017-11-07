@@ -1,8 +1,8 @@
 package com.mihanjk.fintechCurrencyExchange.intent
 
-import com.mihanjk.fintechCurrencyExchange.model.data.Foreign
+import com.mihanjk.fintechCurrencyExchange.model.data.ForeignApi
 
-class StarClickEvent(val base: Foreign, val isFavorite: Boolean)
+class StarClickEvent(val base: ForeignApi, val isFavorite: Boolean)
 
 class StarClickModel() {
     private var inProgress: Boolean = false

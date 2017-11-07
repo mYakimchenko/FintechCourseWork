@@ -1,7 +1,7 @@
 package com.mihanjk.fintechCurrencyExchange.model.api
 
 import com.mihanjk.fintechCurrencyExchange.model.data.Currency
-import com.mihanjk.fintechCurrencyExchange.model.data.Foreign
+import com.mihanjk.fintechCurrencyExchange.model.data.ForeignApi
 import com.mihanjk.fintechCurrencyExchange.model.data.PathDate
 import io.reactivex.Observable
 import retrofit2.http.GET
@@ -11,13 +11,12 @@ import retrofit2.http.Query
 interface FixerService {
     @GET("latest")
     fun getLatestReference(@Query("base") base: Currency,
-                           @Query("symbols") symbols: String): Observable<Foreign>
+                           @Query("symbols") symbols: String): Observable<ForeignApi>
 
     @GET("{date}")
     fun getDateReference(@Path("date") date: PathDate,
                          @Query("base") base: Currency,
-                         @Query("symbols") symbols: String): Observable<Foreign>
-
+                         @Query("symbols") symbols: String): Observable<ForeignApi>
 }
 
 fun FixerService.getLatestReference(base: Currency, vararg symbols: Currency) =

@@ -47,6 +47,20 @@ class StorageModule(val context: Context) {
 
     @Provides
     @Singleton
-    fun provideDatabase() = Room.databaseBuilder(context, CurrencyDatabase::class.java,
-            "currency-database").build()
+    fun provideDatabase(): CurrencyDatabase = Room.databaseBuilder(context, CurrencyDatabase::class.java,
+            "currency-database")
+//            .addCallback(object : RoomDatabase.Callback() {
+//                override fun onCreate(db: SupportSQLiteDatabase) {
+//                    super.onCreate(db)
+//                    // todo maybe exist more concise way to do this or change varargs to list???
+//                    // todo first launch can't get data from db, cause initialization takes time
+//                    Completable.fromAction {
+//                    this@StorageModule.provideDatabase().currencyDao().insert(
+//                            *(Currency.values().mapIndexed { index, currency ->
+//                                CurrencyEntity(null, currency, false, index) }.toTypedArray()))}
+//                            .subscribeOn(Schedulers.io())
+//                            .subscribe()
+//                }
+//            })
+            .build()
 }
