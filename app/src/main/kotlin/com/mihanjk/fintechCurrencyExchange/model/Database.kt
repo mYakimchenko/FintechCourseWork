@@ -1,6 +1,8 @@
 package com.mihanjk.fintechCurrencyExchange.model
 
 import android.arch.persistence.room.*
+import android.os.Parcel
+import android.os.Parcelable
 import com.mihanjk.fintechCurrencyExchange.model.data.Currency
 import io.reactivex.Flowable
 
@@ -8,7 +10,31 @@ import io.reactivex.Flowable
 data class CurrencyEntity(@PrimaryKey(autoGenerate = true) val id: Long?,
                           val name: Currency,
                           var isFavorite: Boolean,
-                          var position: Int)
+                          var position: Int) : Parcelable {
+    companion object {
+        @JvmField
+        val CREATOR: Parcelable.Creator<CurrencyEntity> = object : Parcelable.Creator<CurrencyEntity> {
+            override fun createFromParcel(source: Parcel): CurrencyEntity = CurrencyEntity(source)
+            override fun newArray(size: Int): Array<CurrencyEntity?> = arrayOfNulls(size)
+        }
+    }
+
+    constructor(source: Parcel) : this(
+            source.readValue(Long::class.java.classLoader) as Long?,
+            Currency.values()[source.readInt()],
+            1 == source.readInt(),
+            source.readInt()
+    )
+
+    override fun describeContents() = 0
+
+    override fun writeToParcel(dest: Parcel, flags: Int) = with(dest) {
+        writeValue(id)
+        writeInt(name.ordinal)
+        writeInt((if (isFavorite) 1 else 0))
+        writeInt(position)
+    }
+}
 
 @Dao
 interface CurrencyDao {

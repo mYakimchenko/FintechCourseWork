@@ -8,6 +8,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.mihanjk.fintechCurrencyExchange.R
+import com.mihanjk.fintechCurrencyExchange.model.data.Currency
+import kotlinx.android.synthetic.main.fragment_currency_exchange.view.*
 
 
 /**
@@ -21,16 +23,16 @@ import com.mihanjk.fintechCurrencyExchange.R
 class CurrencyExchangeFragment : Fragment() {
 
     // TODO: Rename and change types of parameters
-    private var mParam1: String? = null
-    private var mParam2: String? = null
+    private lateinit var mFirstCurrency: Currency
+    private lateinit var mSecondCurrency: Currency
 
     private var mListener: OnFragmentInteractionListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (arguments != null) {
-            mParam1 = arguments.getString(ARG_PARAM1)
-            mParam2 = arguments.getString(ARG_PARAM2)
+            mFirstCurrency = Currency.valueOf(arguments.getString(FIRST_CURRENCY))
+            mSecondCurrency = Currency.valueOf(arguments.getString(SECOND_CURRENCY))
         }
     }
 
@@ -38,6 +40,8 @@ class CurrencyExchangeFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         val view = inflater!!.inflate(R.layout.fragment_currency_exchange, container, false)
+        view.firstCurrency.text = mFirstCurrency.name
+        view.secondCurrency.text = mSecondCurrency.name
         return view
     }
 
@@ -77,27 +81,17 @@ class CurrencyExchangeFragment : Fragment() {
     }
 
     companion object {
-        // TODO: Rename parameter arguments, choose names that match
-        // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-        private val ARG_PARAM1 = "param1"
-        private val ARG_PARAM2 = "param2"
+        private val FIRST_CURRENCY = "first"
+        private val SECOND_CURRENCY = "second"
 
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment CurrencyExchangeFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        fun newInstance(param1: String, param2: String): CurrencyExchangeFragment {
+        fun newInstance(firstCurrency: Currency, secondCurrency: Currency):
+                CurrencyExchangeFragment {
             val fragment = CurrencyExchangeFragment()
             val args = Bundle()
-            args.putString(ARG_PARAM1, param1)
-            args.putString(ARG_PARAM2, param2)
+            args.putString(FIRST_CURRENCY, firstCurrency.name)
+            args.putString(SECOND_CURRENCY, secondCurrency.name)
             fragment.arguments = args
             return fragment
         }
     }
-}// Required empty public constructor
+}

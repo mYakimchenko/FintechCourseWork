@@ -26,16 +26,38 @@ import kotlinx.android.synthetic.main.fragment_currency_list.view.*
 import javax.inject.Inject
 
 class CurrencyListFragment : CurrencyRecyclerViewAdapter.OnListItemInteractionListener, Fragment() {
-    override fun onLongClicked(name: Currency) {
-        selectedCurrency.text = name.toString()
+    override fun onLongClicked(item: CurrencyEntity): CurrencyEntity? {
+        selectedCurrency.text = getString(R.string.current_currency, item.name.toString())
+        val previousCurrency = mSelectedCurrency
+        mSelectedCurrency = item
+        return previousCurrency
     }
 
     override fun onClicked(name: Currency) {
+        val fragment = fragmentManager.findFragmentByTag(MainActivity.CURRENCY_EXCHANGE)
+        if (fragment == null) {
+            var firstCurrency = mSelectedCurrency?.name
+            if (firstCurrency == null) {
+                val entity = mAdapter.mValues.sortedBy { it.position }.find { it.name != name && it.isFavorite }
+                if (entity == null) {
+                    firstCurrency = when (name) {
+                        Currency.USD -> Currency.RUB
+                        else -> Currency.USD
+                    }
+                }
+            }
+            fragment = CurrencyExchangeFragment.newInstance(firstCurrency, name)
+        }
+        // todo what i need to do, if fragment already exists
         fragmentManager.beginTransaction().replace(R.id.fragmentContainer,
-                fragmentManager.findFragmentByTag(MainActivity.SECOND_SCREEN) ?:
-                        CurrencyExchangeFragment.newInstance(selectedCurrency.text.toString(), name.toString()),
-                MainActivity.SECOND_SCREEN)
-                .addToBackStack(MainActivity.SECOND_SCREEN)
+                CurrencyExchangeFragment.newInstance(
+                        mSelectedCurrency?.name ?:
+                                mAdapter.mValues
+                                        .sortedBy { it.isFavorite }
+                                        .find { !it.name.equals(name) }
+                                        .also { it == null }, name),
+                MainActivity.CURRENCY_EXCHANGE)
+                .addToBackStack(MainActivity.CURRENCY_EXCHANGE)
                 .commit()
     }
 
@@ -45,6 +67,7 @@ class CurrencyListFragment : CurrencyRecyclerViewAdapter.OnListItemInteractionLi
 
     private lateinit var mAdapter: CurrencyRecyclerViewAdapter
 //    private var mListener: OnListFragmentInteractionListener? = null
+private var mSelectedCurrency: CurrencyEntity? = null
 
     @Inject lateinit var mDatabase: CurrencyDatabase
 
@@ -56,6 +79,8 @@ class CurrencyListFragment : CurrencyRecyclerViewAdapter.OnListItemInteractionLi
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val view = inflater!!.inflate(R.layout.fragment_currency_list, container, false)
+
+        view.selectedCurrency.text = getString(R.string.current_currency, "")
 
         val recycler = view.list
         recycler.addItemDecoration(DividerItemDecoration(context, LinearLayout.VERTICAL))
@@ -95,8 +120,9 @@ class CurrencyListFragment : CurrencyRecyclerViewAdapter.OnListItemInteractionLi
 //        mListener = null
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onPause() {
+        super.onPause()
+        mSelectedCurrency?.let { mAdapter.mValues.add(it.position, it) }
         mAdapter.mValues.forEachIndexed { index, entity -> entity.position = index }
         Completable.fromAction { mDatabase.currencyDao().insert(*(mAdapter.mValues.toTypedArray())) }
                 .subscribeOn(Schedulers.io())

@@ -18,7 +18,7 @@ class CurrencyRecyclerViewAdapter(val mValues: MutableList<CurrencyEntity>,
 
     interface OnListItemInteractionListener {
         fun onStarImageClicked(item: CurrencyEntity)
-        fun onLongClicked(name: Currency)
+        fun onLongClicked(item: CurrencyEntity): CurrencyEntity?
         fun onClicked(name: Currency)
     }
 
@@ -32,13 +32,13 @@ class CurrencyRecyclerViewAdapter(val mValues: MutableList<CurrencyEntity>,
         holder.mItem = mValues[position]
         holder.mCurrencyName.text = holder.mItem.name.toString()
         holder.mStarImage.setImageResource(if (holder.mItem.isFavorite)
-            R.drawable.ic_star_black_24dp else R.drawable.ic_star_border_black_24dp)
+            R.drawable.ic_star_yellow_24dp else R.drawable.ic_star_border_black_24dp)
 
         RxView.clicks(holder.mStarImage).subscribe {
             holder.mItem.isFavorite = !holder.mItem.isFavorite
 //            mListener.onStarImageClicked(holder.mItem)
             holder.mStarImage.setImageResource(if (holder.mItem.isFavorite)
-                R.drawable.ic_star_black_24dp else R.drawable.ic_star_border_black_24dp)
+                R.drawable.ic_star_yellow_24dp else R.drawable.ic_star_border_black_24dp)
             notifyItemChanged(position)
             mValues.removeAt(position)
             val index = mValues.indexOfLast { it.isFavorite }
@@ -50,12 +50,13 @@ class CurrencyRecyclerViewAdapter(val mValues: MutableList<CurrencyEntity>,
         }
 
         RxView.longClicks(holder.mView).subscribe {
-            notifyItemRemoved(position)
-            mListener.onLongClicked(holder.mItem.name)
+            mValues.removeAt(position)
+            notifyDataSetChanged()
+            mListener.onLongClicked(holder.mItem)?.let { mValues.add(it.position, it) }
         }
 
         RxView.clicks(holder.mView).subscribe {
-            mListener.onClicked(holder.mItem.name)
+            mListener.onClicked(holder.mItem)
         }
     }
 

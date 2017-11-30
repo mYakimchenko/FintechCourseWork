@@ -1,14 +1,53 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".view.analysis.AnalysisFragment">
 
+    <Button
+        android:id="@+id/weekButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/week"
+        app:layout_constraintEnd_toStartOf="@id/twoWeekButton"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/twoWeekButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/two_weeks"
+        app:layout_constraintEnd_toStartOf="@id/monthButton"
+        app:layout_constraintStart_toEndOf="@id/weekButton" />
+
+    <Button
+        android:id="@+id/monthButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/month"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/twoWeekButton" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/fromCurrencyList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/weekButton" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/toCurrencyList"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/chart"
+        app:layout_constraintTop_toTopOf="@id/chart" />
+
     <com.github.mikephil.charting.charts.LineChart
         android:id="@+id/chart"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        app:layout_constraintStart_toStartOf="@id/fromCurrencyList"
+        app:layout_constraintTop_toBottomOf="@id/fromCurrencyList" />
 
-    </com.github.mikephil.charting.charts.LineChart>
-
-</FrameLayout>
+</android.support.constraint.ConstraintLayout>

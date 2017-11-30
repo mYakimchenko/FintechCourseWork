@@ -11,9 +11,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimaryDark"
-        android:paddingLeft="16dp"
-        android:paddingStart="16dp"
-        android:text="@string/current_currency" />
+        android:gravity="center_horizontal"
+        android:padding="16dp"
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+        android:textColor="@color/white"
+        tools:text="@string/current_currency" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/list"

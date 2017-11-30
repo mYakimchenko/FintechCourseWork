@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.mihanjk.fintechCurrencyExchange.R
+import kotlinx.android.synthetic.main.fragment_history_filter.view.*
 
 
 /**
@@ -38,7 +39,10 @@ class HistoryFilterFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
-        return inflater!!.inflate(R.layout.fragment_history_filter, container, false)
+        val view = inflater!!.inflate(R.layout.fragment_history_filter, container, false)
+        view.fromDateButton.setOnClickListener { DateDialog().show(fragmentManager, "datePicker") }
+        view.toDateButton.setOnClickListener { DateDialog().show(fragmentManager, "datePicker") }
+        return view
     }
 
     // TODO: Rename method, update argument and hook method into UI event

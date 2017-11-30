@@ -5,7 +5,7 @@
     <string name="analysis">Analysis</string>
     <string name="star_image_description">Star image</string>
     <string name="shared_preferences_key">com.mihanjk.fintechCurrencyExchange.SHARED_PREFERENCES</string>
-    <string name="current_currency">Current currency: \n USD</string>
+    <string name="current_currency">Current currency: %1$s</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
@@ -13,4 +13,11 @@
     <string name="initial_first_currency_value">1.0</string>
     <string name="currency_hint">Enter value</string>
     <string name="filter">Filter</string>
+    <string name="all_time">All time</string>
+    <string name="week">Week</string>
+    <string name="month">Month</string>
+    <string name="from_date">From %1$s</string>
+    <string name="to_date">To %1$s</string>
+    <string name="apply_button">Apply</string>
+    <string name="two_weeks">Two weeks</string>
 </resources>

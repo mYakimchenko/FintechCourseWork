@@ -11,29 +11,38 @@ import com.mihanjk.fintechCurrencyExchange.model.api.FixerService
 import com.mihanjk.fintechCurrencyExchange.view.analysis.AnalysisFragment
 import com.mihanjk.fintechCurrencyExchange.view.currencyExchange.CurrencyExchangeFragment
 import com.mihanjk.fintechCurrencyExchange.view.currencyList.CurrencyListFragment
+import com.mihanjk.fintechCurrencyExchange.view.transactionHistory.HistoryFilterFragment
 import com.mihanjk.fintechCurrencyExchange.view.transactionHistory.HistoryFragment
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
 
 
-class MainActivity : CurrencyExchangeFragment.OnFragmentInteractionListener, AppCompatActivity() {
-    override fun onFragmentInteraction(uri: Uri) {
-        Log.d(javaClass.name, "some")
+class MainActivity : CurrencyExchangeFragment.OnFragmentInteractionListener,
+        HistoryFragment.OnFragmentInteractionListener,
+        HistoryFilterFragment.OnFragmentInteractionListener,
+        AppCompatActivity() {
+
+    override fun onFragmentInteraction() {
+        openScreen(CURRENCY_FILTER)
     }
 
     private val disposables = CompositeDisposable()
 
     companion object {
-        const val FIRST_SCREEN = "First"
-        const val SECOND_SCREEN = "Second"
-        const val THIRD_SCREEN = "Third"
-        const val FOURTH_SCREEN = "Fourth"
-        const val FIFTH_SCREEN = "Fifth"
+        const val CURRENCY_LIST = "CurrencyList"
+        const val CURRENCY_EXCHANGE = "CurrencyExchange"
+        const val CURRENCY_HISTORY = "CurrencyHistory"
+        const val CURRENCY_FILTER = "CurrencyFilter"
+        const val CURRENCY_ANALYSIS = "CurrencyAnalysis"
     }
 
     @Inject
     lateinit var fixerService: FixerService
+
+    override fun onFragmentInteraction(uri: Uri) {
+        Log.d(javaClass.name, "some")
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,9 +53,9 @@ class MainActivity : CurrencyExchangeFragment.OnFragmentInteractionListener, App
 
         RxBottomNavigationView.itemSelections(bottomNavigation).subscribe {
             when (it.itemId) {
-                R.id.action_exchange -> openScreen(FIRST_SCREEN)
-                R.id.action_history -> openScreen(THIRD_SCREEN)
-                R.id.action_analysis -> openScreen(FIFTH_SCREEN)
+                R.id.action_exchange -> openScreen(CURRENCY_LIST)
+                R.id.action_history -> openScreen(CURRENCY_HISTORY)
+                R.id.action_analysis -> openScreen(CURRENCY_ANALYSIS)
             }
         }
 
@@ -62,28 +71,36 @@ class MainActivity : CurrencyExchangeFragment.OnFragmentInteractionListener, App
 
     private fun openScreen(name: String) {
         when (name) {
-            FIRST_SCREEN -> {
+            CURRENCY_LIST -> {
                 supportFragmentManager.beginTransaction()
                         .replace(R.id.fragmentContainer,
-                                supportFragmentManager.findFragmentByTag(FIRST_SCREEN) ?:
-                                        CurrencyListFragment(), FIRST_SCREEN)
-                        .addToBackStack(FIRST_SCREEN)
+                                supportFragmentManager.findFragmentByTag(CURRENCY_LIST) ?:
+                                        CurrencyListFragment(), CURRENCY_LIST)
+                        .addToBackStack(CURRENCY_LIST)
                         .commit()
             }
-            THIRD_SCREEN -> {
+            CURRENCY_HISTORY -> {
                 supportFragmentManager.beginTransaction()
                         .replace(R.id.fragmentContainer,
-                                supportFragmentManager.findFragmentByTag(THIRD_SCREEN) ?:
-                                        HistoryFragment.newInstance("first", "second"), THIRD_SCREEN)
-                        .addToBackStack(THIRD_SCREEN)
+                                supportFragmentManager.findFragmentByTag(CURRENCY_HISTORY) ?:
+                                        HistoryFragment.newInstance("first", "second"), CURRENCY_HISTORY)
+                        .addToBackStack(CURRENCY_HISTORY)
                         .commit()
             }
-            FIFTH_SCREEN -> {
+            CURRENCY_FILTER -> {
                 supportFragmentManager.beginTransaction()
                         .replace(R.id.fragmentContainer,
-                                supportFragmentManager.findFragmentByTag(FIFTH_SCREEN) ?:
-                                        AnalysisFragment.newInstance("first", "second"), FIFTH_SCREEN)
-                        .addToBackStack(THIRD_SCREEN)
+                                supportFragmentManager.findFragmentByTag(CURRENCY_FILTER) ?:
+                                        HistoryFilterFragment.newInstance("first", "second"), CURRENCY_FILTER)
+                        .addToBackStack(CURRENCY_FILTER)
+                        .commit()
+            }
+            CURRENCY_ANALYSIS -> {
+                supportFragmentManager.beginTransaction()
+                        .replace(R.id.fragmentContainer,
+                                supportFragmentManager.findFragmentByTag(CURRENCY_ANALYSIS) ?:
+                                        AnalysisFragment.newInstance("first", "second"), CURRENCY_ANALYSIS)
+                        .addToBackStack(CURRENCY_HISTORY)
                         .commit()
             }
         }
