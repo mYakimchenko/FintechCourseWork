@@ -1,6 +1,7 @@
 package com.mihanjk.fintechCurrencyExchange
 
 import android.app.Application
+import com.facebook.stetho.Stetho
 import com.mihanjk.fintechCurrencyExchange.di.AppComponent
 import com.mihanjk.fintechCurrencyExchange.di.DaggerAppComponent
 import com.mihanjk.fintechCurrencyExchange.di.NetModule
@@ -17,5 +18,6 @@ class CurrencyApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        Stetho.initializeWithDefaults(this)
     }
 }

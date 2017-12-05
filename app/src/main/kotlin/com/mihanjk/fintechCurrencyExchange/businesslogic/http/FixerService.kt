@@ -1,4 +1,4 @@
-package com.mihanjk.fintechCurrencyExchange.model.api
+package com.mihanjk.fintechCurrencyExchange.businesslogic.http
 
 import com.mihanjk.fintechCurrencyExchange.model.data.Currency
 import com.mihanjk.fintechCurrencyExchange.model.data.ForeignApi

@@ -7,7 +7,7 @@ import android.util.Log
 import com.jakewharton.rxbinding2.support.design.widget.RxBottomNavigationView
 import com.mihanjk.fintechCurrencyExchange.CurrencyApplication
 import com.mihanjk.fintechCurrencyExchange.R
-import com.mihanjk.fintechCurrencyExchange.model.api.FixerService
+import com.mihanjk.fintechCurrencyExchange.businesslogic.http.FixerService
 import com.mihanjk.fintechCurrencyExchange.view.analysis.AnalysisFragment
 import com.mihanjk.fintechCurrencyExchange.view.currencyExchange.CurrencyExchangeFragment
 import com.mihanjk.fintechCurrencyExchange.view.currencyList.CurrencyListFragment

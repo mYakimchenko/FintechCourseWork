@@ -4,8 +4,9 @@ import android.arch.persistence.room.Room
 import android.content.Context
 import com.mihanjk.fintechCurrencyExchange.CurrencyApplication
 import com.mihanjk.fintechCurrencyExchange.R
+import com.mihanjk.fintechCurrencyExchange.businesslogic.http.FixerService
 import com.mihanjk.fintechCurrencyExchange.model.CurrencyDatabase
-import com.mihanjk.fintechCurrencyExchange.model.api.FixerService
+import com.mihanjk.fintechCurrencyExchange.view.currencyList.CurrencyListPresenter
 import dagger.Module
 import dagger.Provides
 import retrofit2.Retrofit
@@ -63,4 +64,11 @@ class StorageModule(val context: Context) {
 //                }
 //            })
             .build()
+}
+
+@Module(includes = arrayOf(StorageModule::class))
+class PresenterModule {
+    @Provides
+    @Singleton
+    fun provideCurrencyListPresenter(database: CurrencyDatabase) = CurrencyListPresenter(database)
 }

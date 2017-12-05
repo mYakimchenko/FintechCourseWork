@@ -17,6 +17,13 @@
         android:textColor="@color/white"
         tools:text="@string/current_currency" />
 
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/selectedCurrency"
+        android:layout_centerHorizontal="true" />
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/list"
         android:name="com.mihanjk.fintechCurrencyExchange.view.currencyList.CurrencyListFragment"
