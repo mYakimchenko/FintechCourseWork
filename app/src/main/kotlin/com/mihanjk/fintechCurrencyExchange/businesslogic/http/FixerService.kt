@@ -11,12 +11,12 @@ import retrofit2.http.Query
 interface FixerService {
     @GET("latest")
     fun getLatestReference(@Query("base") base: Currency,
-                           @Query("symbols") symbols: String): Observable<ForeignApi>
+                           @Query("symbols") symbols: String? = null): Observable<ForeignApi>
 
     @GET("{date}")
     fun getDateReference(@Path("date") date: PathDate,
                          @Query("base") base: Currency,
-                         @Query("symbols") symbols: String): Observable<ForeignApi>
+                         @Query("symbols") symbols: String? = null): Observable<ForeignApi>
 }
 
 fun FixerService.getLatestReference(base: Currency, vararg symbols: Currency) =

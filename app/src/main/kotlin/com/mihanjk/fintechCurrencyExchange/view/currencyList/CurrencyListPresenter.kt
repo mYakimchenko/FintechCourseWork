@@ -1,6 +1,5 @@
 package com.mihanjk.fintechCurrencyExchange.view.currencyList
 
-import android.util.Log
 import com.hannesdorfmann.mosby3.mvi.MviBasePresenter
 import com.mihanjk.fintechCurrencyExchange.model.CurrencyDatabase
 import com.mihanjk.fintechCurrencyExchange.view.currencyList.PartialStateChanges.*
@@ -15,13 +14,11 @@ class CurrencyListPresenter @Inject constructor(
 ) : MviBasePresenter<CurrencyListView, CurrencyListViewState>() {
 
     override fun bindIntents() {
-        // todo can't get data from database and render it
         val loadCurrencyList: Observable<PartialStateChanges> =
                 intent(CurrencyListView::loadCurrencyListIntent)
                         .flatMap { mDatabase.currencyDao().getAllRecords().toObservable() }
-                        .doOnNext { Log.d("TAG", it.toString()) }
                         .map { PartialStateChanges.CurrencyListLoaded(it) as PartialStateChanges }
-                        .startWith { PartialStateChanges.Loading }
+                        .startWith ( PartialStateChanges.Loading )
                         .onErrorReturn { PartialStateChanges.Error(it) }
                         .subscribeOn(Schedulers.io())
 

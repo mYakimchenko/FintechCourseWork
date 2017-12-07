@@ -6,6 +6,7 @@ import com.mihanjk.fintechCurrencyExchange.CurrencyApplication
 import com.mihanjk.fintechCurrencyExchange.R
 import com.mihanjk.fintechCurrencyExchange.businesslogic.http.FixerService
 import com.mihanjk.fintechCurrencyExchange.model.CurrencyDatabase
+import com.mihanjk.fintechCurrencyExchange.view.currencyExchange.CurrencyExchangePresenter
 import com.mihanjk.fintechCurrencyExchange.view.currencyList.CurrencyListPresenter
 import dagger.Module
 import dagger.Provides
@@ -66,9 +67,14 @@ class StorageModule(val context: Context) {
             .build()
 }
 
-@Module(includes = arrayOf(StorageModule::class))
+@Module(includes = arrayOf(StorageModule::class, NetModule::class))
 class PresenterModule {
     @Provides
     @Singleton
     fun provideCurrencyListPresenter(database: CurrencyDatabase) = CurrencyListPresenter(database)
+
+    @Provides
+    @Singleton
+    fun provideCurrencyExchangePresenter(database: CurrencyDatabase, apiService: FixerService) =
+            CurrencyExchangePresenter(database, apiService)
 }
