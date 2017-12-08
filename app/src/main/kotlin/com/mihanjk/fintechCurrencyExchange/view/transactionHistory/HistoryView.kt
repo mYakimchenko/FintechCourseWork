@@ -1,5 +1,11 @@
 package com.mihanjk.fintechCurrencyExchange.view.transactionHistory
 
-/**
- * Created by mihanjk on 12/5/17.
- */
+import com.hannesdorfmann.mosby3.mvp.MvpView
+import io.reactivex.Observable
+
+interface HistoryView : MvpView {
+    fun loadTransactions(): Observable<Boolean>
+
+    fun render(state: HistoryViewState)
+}
+

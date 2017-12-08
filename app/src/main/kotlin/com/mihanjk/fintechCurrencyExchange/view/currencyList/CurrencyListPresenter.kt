@@ -1,7 +1,8 @@
 package com.mihanjk.fintechCurrencyExchange.view.currencyList
 
+import android.util.Log
 import com.hannesdorfmann.mosby3.mvi.MviBasePresenter
-import com.mihanjk.fintechCurrencyExchange.model.CurrencyDatabase
+import com.mihanjk.fintechCurrencyExchange.businesslogic.interactor.CurrencyListInteractor
 import com.mihanjk.fintechCurrencyExchange.view.currencyList.PartialStateChanges.*
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -10,32 +11,44 @@ import javax.inject.Inject
 
 
 class CurrencyListPresenter @Inject constructor(
-        val mDatabase: CurrencyDatabase
+        val mInteractor: CurrencyListInteractor
 ) : MviBasePresenter<CurrencyListView, CurrencyListViewState>() {
 
     override fun bindIntents() {
-        val loadCurrencyList: Observable<PartialStateChanges> =
+        val loadCurrencyList =
                 intent(CurrencyListView::loadCurrencyListIntent)
-                        .flatMap { mDatabase.currencyDao().getAllRecords().toObservable() }
+                        .flatMap { mInteractor.getCurrencyList() }
+                        .doOnNext { Log.d("Test", "Load current list") }
                         .map { PartialStateChanges.CurrencyListLoaded(it) as PartialStateChanges }
-                        .startWith ( PartialStateChanges.Loading )
+                        .startWith(PartialStateChanges.Loading)
                         .onErrorReturn { PartialStateChanges.Error(it) }
                         .subscribeOn(Schedulers.io())
 
+//        val refreshCurrencyList =
+//                intent(CurrencyListView::refreshCurrencyListIntent)
+//                        .flatMap { RefreshCompleted() }
+
         val toggleFavorite =
                 intent(CurrencyListView::toggleFavoriteIntent)
+                        .doOnNext { Log.d("Test", "Toggle favorite") }
                         .map { ToggleFavoriteCompleted(it) }
 
         val changeCurrentCurrency =
                 intent(CurrencyListView::changeCurrentCurrencyIntent)
+                        .doOnNext { Log.d("Test", "change current currency") }
                         .map { CurrentCurrencyChanged(it) }
 
         val makeCurrencyExchange =
                 intent(CurrencyListView::makeCurrencyExchange)
+                        .doOnNext { Log.d("Test", "make exchange") }
                         .map { NavigateToCurrencyExchange(it) }
 
+        val currencyExchangeOpened = intent(CurrencyListView::CurrencyExchangeOpened)
+                .doOnNext { Log.d("Test", "opened") }
+                .map { PartialStateChanges.CurrencyExchangeOpened }
+
         val allIntentObservable = Observable.merge(loadCurrencyList, toggleFavorite,
-                changeCurrentCurrency, makeCurrencyExchange)
+                changeCurrentCurrency, makeCurrencyExchange).mergeWith(currencyExchangeOpened)
                 .observeOn(AndroidSchedulers.mainThread())
 
         subscribeViewState(allIntentObservable.scan(CurrencyListViewState(),
@@ -54,11 +67,23 @@ class CurrencyListPresenter @Inject constructor(
                 is Loading -> previousState.copy(loading = true)
                 is Error -> previousState.copy(loading = false, error = partialChanges.error)
                 is CurrencyListLoaded -> previousState.copy(loading = false, data = partialChanges.data)
-                is ToggleFavoriteCompleted -> previousState.copy(data = previousState.data.apply {
-                    val element = find { it.id == partialChanges.entity.id }
-                    element?.let { it.isFavorite = !it.isFavorite }
-                })
-                is NavigateToCurrencyExchange -> previousState.copy(clickedCurrency = partialChanges.entity)
-                is CurrentCurrencyChanged -> previousState.copy(currencyCurrency = partialChanges.entity)
+            // todo why don't called render method???
+                is ToggleFavoriteCompleted -> {
+                    val name = partialChanges.clicked.name
+                    previousState.copy(data = previousState.data.apply {
+                        val element = find { it.name == name }
+                        element?.let { it.isFavorite = !it.isFavorite }
+                    })
+                }
+                is NavigateToCurrencyExchange -> {
+                    val name = partialChanges.clicked.name
+                    previousState.copy(currencyCurrency = previousState.currencyCurrency ?: name,
+                            returnFromExchange = true,
+                            clickedCurrency =
+                            previousState.data.find { it.isFavorite && it.name != name }?.name
+                                    ?: if (name == "USD") "RUB" else "USD")
+                }
+                is CurrentCurrencyChanged -> previousState.copy(currencyCurrency = partialChanges.entity.name)
+                is CurrencyExchangeOpened -> previousState.copy(clickedCurrency = null)
             }
 }

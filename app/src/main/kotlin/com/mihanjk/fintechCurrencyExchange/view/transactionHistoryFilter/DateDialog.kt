@@ -1,4 +1,4 @@
-package com.mihanjk.fintechCurrencyExchange.view.transactionHistory
+package com.mihanjk.fintechCurrencyExchange.view.transactionHistoryFilter
 
 import android.app.DatePickerDialog
 import android.app.Dialog

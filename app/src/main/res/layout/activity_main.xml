@@ -5,13 +5,13 @@
     android:id="@+id/root_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.mihanjk.fintechCurrencyExchange.view.MainActivity">
+    tools:context="com.mihanjk.fintechCurrencyExchange.view.mainActivity.MainActivity">
 
     <FrameLayout
         android:id="@+id/fragmentContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/bottomNavigation"/>
+        android:layout_above="@id/bottomNavigation" />
 
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/bottomNavigation"

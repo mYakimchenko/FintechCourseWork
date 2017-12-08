@@ -1,6 +1,6 @@
 package com.mihanjk.fintechCurrencyExchange.view.currencyExchange
 
-import com.mihanjk.fintechCurrencyExchange.model.CurrencyEntity
+import com.mihanjk.fintechCurrencyExchange.model.database.CurrencyEntity
 
 data class CurrencyExchangeViewState(
         val firstCurrency: CurrencyEntity,

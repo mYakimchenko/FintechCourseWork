@@ -8,11 +8,11 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.jakewharton.rxbinding2.view.RxView
 import com.mihanjk.fintechCurrencyExchange.R
-import com.mihanjk.fintechCurrencyExchange.model.CurrencyEntity
+import com.mihanjk.fintechCurrencyExchange.model.database.CurrencyEntity
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.fragment_currency_item.view.*
 
-class CurrencyListAdapter(var mValues: MutableList<CurrencyEntity>) :
+class CurrencyListAdapter(var mValues: List<CurrencyEntity>) :
         RecyclerView.Adapter<CurrencyListAdapter.ViewHolder>() {
 
     val starClickSubject = PublishSubject.create<CurrencyEntity>()
@@ -69,7 +69,7 @@ class CurrencyListAdapter(var mValues: MutableList<CurrencyEntity>) :
         }
 
         fun bind(item: CurrencyEntity) {
-            mCurrencyName.text = item.name.toString()
+            mCurrencyName.text = item.name
             mStarImage.setImageResource(if (item.isFavorite)
                 R.drawable.ic_star_yellow_24dp else R.drawable.ic_star_border_black_24dp)
         }

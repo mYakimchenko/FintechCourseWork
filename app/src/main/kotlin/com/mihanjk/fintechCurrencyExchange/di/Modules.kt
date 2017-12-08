@@ -5,9 +5,12 @@ import android.content.Context
 import com.mihanjk.fintechCurrencyExchange.CurrencyApplication
 import com.mihanjk.fintechCurrencyExchange.R
 import com.mihanjk.fintechCurrencyExchange.businesslogic.http.FixerService
-import com.mihanjk.fintechCurrencyExchange.model.CurrencyDatabase
+import com.mihanjk.fintechCurrencyExchange.businesslogic.interactor.*
+import com.mihanjk.fintechCurrencyExchange.model.database.CurrencyDatabase
 import com.mihanjk.fintechCurrencyExchange.view.currencyExchange.CurrencyExchangePresenter
 import com.mihanjk.fintechCurrencyExchange.view.currencyList.CurrencyListPresenter
+import com.mihanjk.fintechCurrencyExchange.view.mainActivity.MainPresenter
+import com.mihanjk.fintechCurrencyExchange.view.transactionHistory.HistoryPresenter
 import dagger.Module
 import dagger.Provides
 import retrofit2.Retrofit
@@ -49,32 +52,47 @@ class StorageModule(val context: Context) {
 
     @Provides
     @Singleton
-    fun provideDatabase(): CurrencyDatabase = Room.databaseBuilder(context, CurrencyDatabase::class.java,
-            "currency-database")
-//            .addCallback(object : RoomDatabase.Callback() {
-//                override fun onCreate(db: SupportSQLiteDatabase) {
-//                    super.onCreate(db)
-//                    // todo maybe exist more concise way to do this or change varargs to list???
-//                    // todo first launch can't get data from db, cause initialization takes time
-//                    Completable.fromAction {
-//                    this@StorageModule.provideDatabase().currencyDao().insert(
-//                            *(Currency.values().mapIndexed { index, currency ->
-//                                CurrencyEntity(null, currency, false, index) }.toTypedArray()))}
-//                            .subscribeOn(Schedulers.io())
-//                            .subscribe()
-//                }
-//            })
-            .build()
+    fun provideDatabase(): CurrencyDatabase = Room.databaseBuilder(context,
+            CurrencyDatabase::class.java, "currency-database").build()
 }
 
-@Module(includes = arrayOf(StorageModule::class, NetModule::class))
+@Module(includes = [StorageModule::class, NetModule::class])
+class InteractorModule {
+    @Provides
+    @Singleton
+    fun provideCurrencyListInteractor(database: CurrencyDatabase, apiService: FixerService): CurrencyListInteractor =
+            CurrencyListInteractorImpl(database, apiService)
+
+    @Provides
+    @Singleton
+    fun provideCurrencyExchangeInteractor(database: CurrencyDatabase, apiService: FixerService): CurrencyExchangeInteractor =
+            CurrencyExchangeInteractorImpl(database, apiService)
+
+    @Provides
+    @Singleton
+    fun provideHistoryInteractor(database: CurrencyDatabase): HistoryInteractor =
+            HistoryInteractorImpl(database)
+}
+
+@Module(includes = [InteractorModule::class])
 class PresenterModule {
     @Provides
     @Singleton
-    fun provideCurrencyListPresenter(database: CurrencyDatabase) = CurrencyListPresenter(database)
+    fun provideCurrencyListPresenter(interactor: CurrencyListInteractor) =
+            CurrencyListPresenter(interactor)
 
     @Provides
     @Singleton
-    fun provideCurrencyExchangePresenter(database: CurrencyDatabase, apiService: FixerService) =
-            CurrencyExchangePresenter(database, apiService)
+    fun provideCurrencyExchangePresenter(interactor: CurrencyExchangeInteractor) =
+            CurrencyExchangePresenter(interactor)
+
+    @Provides
+    @Singleton
+    fun provideHistoryPresenter(interactor: HistoryInteractor) =
+            HistoryPresenter(interactor)
+
+    @Provides
+    @Singleton
+    fun provideMainPresenter() = MainPresenter()
 }
+

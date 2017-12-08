@@ -49,6 +49,7 @@ dependencies {
     implementation "com.jakewharton.rxbinding2:rxbinding-kotlin:$rxbinding_version"
     implementation "com.jakewharton.rxbinding2:rxbinding-design-kotlin:$rxbinding_version"
     implementation "com.jakewharton.rxbinding2:rxbinding-recyclerview-v7-kotlin:$rxbinding_version"
+    implementation "com.jakewharton.rxbinding2:rxbinding-support-v4-kotlin:$rxbinding_version"
 
     // Support
     implementation "com.android.support:design:$support_version"
@@ -80,3 +81,4 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
 }
+

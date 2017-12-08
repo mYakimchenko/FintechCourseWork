@@ -1,7 +1,7 @@
 package com.mihanjk.fintechCurrencyExchange.view.currencyExchange
 
 import com.hannesdorfmann.mosby3.mvp.MvpView
-import com.mihanjk.fintechCurrencyExchange.model.CurrencyEntity
+import com.mihanjk.fintechCurrencyExchange.model.database.CurrencyEntity
 import io.reactivex.Observable
 
 interface CurrencyExchangeView : MvpView {

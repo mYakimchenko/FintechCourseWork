@@ -8,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.mihanjk.fintechCurrencyExchange.R
-import com.mihanjk.fintechCurrencyExchange.model.data.Currency
 import kotlinx.android.synthetic.main.fragment_currency_exchange.view.*
 
 
@@ -23,16 +22,16 @@ import kotlinx.android.synthetic.main.fragment_currency_exchange.view.*
 class CurrencyExchangeFragment : Fragment() {
 
     // TODO: Rename and change types of parameters
-    private lateinit var mFirstCurrency: Currency
-    private lateinit var mSecondCurrency: Currency
+    private lateinit var mFirstCurrency: String
+    private lateinit var mSecondCurrency: String
 
     private var mListener: OnFragmentInteractionListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (arguments != null) {
-            mFirstCurrency = Currency.valueOf(arguments.getString(FIRST_CURRENCY))
-            mSecondCurrency = Currency.valueOf(arguments.getString(SECOND_CURRENCY))
+            mFirstCurrency = (arguments.getString(FIRST_CURRENCY))
+            mSecondCurrency = (arguments.getString(SECOND_CURRENCY))
         }
     }
 
@@ -40,8 +39,8 @@ class CurrencyExchangeFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         val view = inflater!!.inflate(R.layout.fragment_currency_exchange, container, false)
-        view.firstCurrency.text = mFirstCurrency.name
-        view.secondCurrency.text = mSecondCurrency.name
+        view.firstCurrency.text = mFirstCurrency
+        view.secondCurrency.text = mSecondCurrency
         return view
     }
 
@@ -75,6 +74,7 @@ class CurrencyExchangeFragment : Fragment() {
      *
      * See the Android Training lesson [Communicating with Other Fragments](http://developer.android.com/training/basics/fragments/communicating.html) for more information.
      */
+
     interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         fun onFragmentInteraction(uri: Uri)
@@ -84,12 +84,12 @@ class CurrencyExchangeFragment : Fragment() {
         private val FIRST_CURRENCY = "first"
         private val SECOND_CURRENCY = "second"
 
-        fun newInstance(firstCurrency: Currency, secondCurrency: Currency):
+        fun newInstance(firstCurrency: String, secondCurrency: String):
                 CurrencyExchangeFragment {
             val fragment = CurrencyExchangeFragment()
             val args = Bundle()
-            args.putString(FIRST_CURRENCY, firstCurrency.name)
-            args.putString(SECOND_CURRENCY, secondCurrency.name)
+            args.putString(FIRST_CURRENCY, firstCurrency)
+            args.putString(SECOND_CURRENCY, secondCurrency)
             fragment.arguments = args
             return fragment
         }
