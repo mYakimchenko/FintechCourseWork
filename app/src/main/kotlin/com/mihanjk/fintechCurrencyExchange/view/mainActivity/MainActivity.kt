@@ -22,10 +22,8 @@ class MainActivity : MainView, MviActivity<MainView, MainPresenter>() {
 
     private val saveCurrencySubject = PublishSubject.create<MainPartialState.saveCurrencyExchangeFragment>()
     private val removeCurrencyExchangeSubject = PublishSubject.create<MainPartialState.removeCurrencyExchangeFragment>()
-    private val openLastExchangeSubject = PublishSubject.create<MainPartialState.openLastExchange>()
-    private val openAnalysisSubject = PublishSubject.create<MainPartialState.openAnalysisFragment>()
-    private val openLastHistorySubject = PublishSubject.create<MainPartialState.openLastHistoryFragment>()
     private val removeHistoryFilterSubject = PublishSubject.create<MainPartialState.removeHistoryFilterFragment>()
+    private val removeFromStackSubject = PublishSubject.create<MainPartialState.removeFragmentFromStack>()
 
     override fun createPresenter(): MainPresenter =
             (application as CurrencyApplication).component.getMainPresenter()
@@ -36,11 +34,15 @@ class MainActivity : MainView, MviActivity<MainView, MainPresenter>() {
     override fun removeCurrencyExchangeIntent(): Observable<MainPartialState.removeCurrencyExchangeFragment> =
             removeCurrencyExchangeSubject
 
-    override fun openLastExchangeFragmentIntent(): Observable<MainPartialState.openLastExchange> =
-            openLastExchangeSubject
-
-    override fun openAnalysisFragmentIntent(): Observable<MainPartialState.openAnalysisFragment> =
-            openAnalysisSubject
+    override fun openFragmentTab(): Observable<MainPartialState> =
+            RxBottomNavigationView.itemSelections(bottomNavigation).map {
+                when (it.itemId) {
+                    R.id.action_exchange -> (MainPartialState.openLastExchange)
+                    R.id.action_history -> (MainPartialState.openLastHistoryFragment)
+                    R.id.action_analysis -> (MainPartialState.openAnalysisFragment)
+                    else -> throw IllegalStateException("Unknown navigation item id")
+                }
+            }
 
     override fun saveFilterFragmentIntent(): Observable<Boolean> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
@@ -50,11 +52,8 @@ class MainActivity : MainView, MviActivity<MainView, MainPresenter>() {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun openLastHistoryFragment(): Observable<MainPartialState.openLastHistoryFragment> =
-            openLastHistorySubject
-
     override fun render(state: MainViewState) {
-        Log.d("Test", "state: $state")
+        Log.d("Rx", "Main activity state: $state")
         when {
             state.exchange -> openFragment(state.exchangeFragments.last)
             state.history -> openFragment(state.historyFragments.last)
@@ -67,23 +66,21 @@ class MainActivity : MainView, MviActivity<MainView, MainPresenter>() {
     private fun openFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
                 .replace(R.id.fragmentContainer, fragment)
+                .addToBackStack(fragment.tag)
                 .commit()
     }
 
+    override fun removeFragmentFromStack() =
+            removeFromStackSubject
+
+    fun removeFromStack(tag: String) = removeFromStackSubject.onNext(MainPartialState.removeFragmentFromStack(tag))
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        bottomNavigation.selectedItemId = R.id.action_exchange
 
-        RxBottomNavigationView.itemSelections(bottomNavigation).subscribe {
-            when (it.itemId) {
-                R.id.action_exchange -> openLastExchangeSubject.onNext(MainPartialState.openLastExchange)
-                R.id.action_history -> openLastHistorySubject.onNext(MainPartialState.openLastHistoryFragment)
-                R.id.action_analysis -> openAnalysisSubject.onNext(MainPartialState.openAnalysisFragment)
-            }
-        }
+        bottomNavigation.selectedItemId = R.id.action_exchange
     }
 
     fun openCurrencyExchangeScreen(first: String, second: String) =

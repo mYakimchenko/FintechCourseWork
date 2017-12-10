@@ -24,9 +24,10 @@ class CurrencyListPresenter @Inject constructor(
                         .onErrorReturn { PartialStateChanges.Error(it) }
                         .subscribeOn(Schedulers.io())
 
-//        val refreshCurrencyList =
-//                intent(CurrencyListView::refreshCurrencyListIntent)
-//                        .flatMap { RefreshCompleted() }
+        val refreshCurrencyList =
+                intent(CurrencyListView::refreshCurrencyListIntent)
+                        .flatMap { mInteractor.getCurrencyList() }
+                        .map { CurrencyListLoaded(it) as PartialStateChanges }
 
         val toggleFavorite =
                 intent(CurrencyListView::toggleFavoriteIntent)
@@ -43,23 +44,28 @@ class CurrencyListPresenter @Inject constructor(
                         .doOnNext { Log.d("Test", "make exchange") }
                         .map { NavigateToCurrencyExchange(it) }
 
-        val currencyExchangeOpened = intent(CurrencyListView::CurrencyExchangeOpened)
+        val currencyExchangeOpened = intent(CurrencyListView::currencyExchangeOpened)
                 .doOnNext { Log.d("Test", "opened") }
                 .map { PartialStateChanges.CurrencyExchangeOpened }
 
+        intent(CurrencyListView::saveCurrencyListIntent)
+                .doOnNext { Log.d("Rx", "Caching into database: $it") }
+                .map { mInteractor.saveCurrencyEntityIntoDatabase(it) }
+                .subscribeOn(Schedulers.io())
+                .subscribe()
+
         val allIntentObservable = Observable.merge(loadCurrencyList, toggleFavorite,
-                changeCurrentCurrency, makeCurrencyExchange).mergeWith(currencyExchangeOpened)
+                changeCurrentCurrency, makeCurrencyExchange)
+                .mergeWith(currencyExchangeOpened)
+                .mergeWith(refreshCurrencyList)
                 .observeOn(AndroidSchedulers.mainThread())
 
+
         subscribeViewState(allIntentObservable.scan(CurrencyListViewState(),
-                this::viewStateRecuder).distinctUntilChanged(),
+                this::viewStateRecuder),
+//                .distinctUntilChanged(),
                 CurrencyListView::render)
 
-//        TODO("How to save to database?")
-//        intent(CurrencyListView::saveCurrencyListIntent)
-//                .flatMap { mDatabase.currencyDao().insert(*(it.toTypedArray())).toObservable() }
-//                .subscribeOn(Schedulers.io())
-//                .subscribe()
     }
 
     fun viewStateRecuder(previousState: CurrencyListViewState, partialChanges: PartialStateChanges) =
@@ -77,13 +83,13 @@ class CurrencyListPresenter @Inject constructor(
                 }
                 is NavigateToCurrencyExchange -> {
                     val name = partialChanges.clicked.name
-                    previousState.copy(currencyCurrency = previousState.currencyCurrency ?: name,
-                            returnFromExchange = true,
-                            clickedCurrency =
-                            previousState.data.find { it.isFavorite && it.name != name }?.name
-                                    ?: if (name == "USD") "RUB" else "USD")
+                    val clickedCurrency = if (previousState.currencyCurrency != null) name
+                    else previousState.data.find { it.isFavorite && it.name != name }?.name
+                            ?: if (name == "USD") "RUB" else "USD"
+                    previousState.copy(returnFromExchange = true, currencyCurrency = previousState.currencyCurrency ?: name,
+                            clickedCurrency = clickedCurrency)
                 }
                 is CurrentCurrencyChanged -> previousState.copy(currencyCurrency = partialChanges.entity.name)
-                is CurrencyExchangeOpened -> previousState.copy(clickedCurrency = null)
+                is CurrencyExchangeOpened -> previousState.copy(clickedCurrency = null, currencyCurrency = null)
             }
 }

@@ -5,11 +5,11 @@ import android.view.*
 import com.hannesdorfmann.mosby3.mvi.MviFragment
 import com.mihanjk.fintechCurrencyExchange.CurrencyApplication
 import com.mihanjk.fintechCurrencyExchange.R
-import com.mihanjk.fintechCurrencyExchange.view.mainActivity.MainActivity
 import io.reactivex.Observable
 
 
 class HistoryFragment : HistoryView, MviFragment<HistoryView, HistoryPresenter>() {
+
     override fun loadTransactions(): Observable<Boolean> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
@@ -32,8 +32,9 @@ class HistoryFragment : HistoryView, MviFragment<HistoryView, HistoryPresenter>(
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        TODO()
         when (item?.itemId) {
-            R.id.filter_history -> (activity as MainActivity).openHistoryFilterScreen()
+//            R.id.filter_history -> (activity as MainActivity).openHistoryFilterScreen()
         }
         return super.onOptionsItemSelected(item)
     }

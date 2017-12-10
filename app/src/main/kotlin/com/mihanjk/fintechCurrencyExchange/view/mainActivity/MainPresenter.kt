@@ -11,12 +11,10 @@ class MainPresenter : MviBasePresenter<MainView, MainViewState>() {
     override fun bindIntents() {
         val allIntents = Observable.merge(intent(MainView::saveCurrencyExchangeIntent),
                 intent(MainView::removeCurrencyExchangeIntent),
-                intent(MainView::openAnalysisFragmentIntent),
-                intent(MainView::openLastExchangeFragmentIntent))
-                .mergeWith(intent(MainView::openLastHistoryFragment))
+                intent(MainView::openFragmentTab))
 
-        subscribeViewState(allIntents.scan(MainViewState(), this::reducer)
-                .distinctUntilChanged(),
+        subscribeViewState(allIntents.scan(MainViewState(), this::reducer),
+//                .distinctUntilChanged()
                 MainView::render)
     }
 
@@ -30,7 +28,7 @@ class MainPresenter : MviBasePresenter<MainView, MainViewState>() {
 
                 is MainPartialState.saveCurrencyExchangeFragment -> previous.copy(exchange = true,
                         history = false, analysis = false, exchangeFragments =
-                previous.exchangeFragments.apply { push(CurrencyExchangeFragment.newInstance(changes.first, changes.second)) })
+                previous.exchangeFragments.apply { add(CurrencyExchangeFragment.newInstance(changes.first, changes.second)) })
 
                 is MainPartialState.removeCurrencyExchangeFragment -> previous.copy(exchange = true,
                         history = false, analysis = false, exchangeFragments =
@@ -47,5 +45,11 @@ class MainPresenter : MviBasePresenter<MainView, MainViewState>() {
                 is MainPartialState.removeHistoryFilterFragment -> previous.copy(history = true,
                         analysis = false, exchange = false, historyFragments =
                 previous.historyFragments.apply { pollLast() })
+
+                is MainPartialState.removeFragmentFromStack -> previous.copy(exchange = true,
+                        analysis = false, history = false, historyFragments =
+                previous.historyFragments.apply {
+                    remove(find { it?.tag == changes.tag })
+                })
             }
 }

@@ -51,6 +51,9 @@ dependencies {
     implementation "com.jakewharton.rxbinding2:rxbinding-recyclerview-v7-kotlin:$rxbinding_version"
     implementation "com.jakewharton.rxbinding2:rxbinding-support-v4-kotlin:$rxbinding_version"
 
+    // RxRelay
+    implementation "com.jakewharton.rxrelay2:rxrelay:2.0.0"
+
     // Support
     implementation "com.android.support:design:$support_version"
     implementation "com.android.support:appcompat-v7:$support_version"

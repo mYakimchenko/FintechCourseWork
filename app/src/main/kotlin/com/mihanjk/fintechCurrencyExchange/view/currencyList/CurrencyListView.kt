@@ -11,7 +11,7 @@ interface CurrencyListView : MvpView {
     fun toggleFavoriteIntent(): Observable<CurrencyEntity>
     fun changeCurrentCurrencyIntent(): Observable<CurrencyEntity>
     fun makeCurrencyExchange(): Observable<CurrencyEntity>
-    fun CurrencyExchangeOpened(): Observable<Boolean>
+    fun currencyExchangeOpened(): Observable<Boolean>
     fun saveCurrencyListIntent(): Observable<List<CurrencyEntity>>
 
     fun render(state: CurrencyListViewState)

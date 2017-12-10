@@ -8,4 +8,6 @@ sealed class MainPartialState {
     object openAnalysisFragment : MainPartialState()
     object openLastHistoryFragment : MainPartialState()
     object removeHistoryFilterFragment : MainPartialState()
+    data class removeFragmentFromStack(val tag: String) : MainPartialState()
+
 }

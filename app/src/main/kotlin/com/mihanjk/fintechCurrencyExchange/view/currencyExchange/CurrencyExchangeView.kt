@@ -1,13 +1,15 @@
 package com.mihanjk.fintechCurrencyExchange.view.currencyExchange
 
 import com.hannesdorfmann.mosby3.mvp.MvpView
-import com.mihanjk.fintechCurrencyExchange.model.database.CurrencyEntity
+import com.mihanjk.fintechCurrencyExchange.model.database.CurrencyTransaction
 import io.reactivex.Observable
 
 interface CurrencyExchangeView : MvpView {
-    fun getCurrencyCourseIntent(): Observable<Pair<CurrencyEntity, CurrencyEntity>>
-    fun makeCurrencyExchangeIntent(): Observable<CurrencyEntity>
-    fun updateCourseIntent(): Observable<CurrencyEntity>
+    fun initializeViewState(first: String, second: String): Observable<Pair<String, String>>
+    fun getCurrencyCourseIntent(): Observable<Pair<String, String>>
+    fun makeCurrencyExchangeIntent(): Observable<CurrencyTransaction>
+    fun modifyAmountFirstCurrencyIntent(): Observable<Double>
+    fun modifyAmountSecondCurrencyIntent(): Observable<Double>
 
     fun render(state: CurrencyExchangeViewState)
 }

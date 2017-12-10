@@ -1,31 +1,60 @@
 package com.mihanjk.fintechCurrencyExchange.view.currencyExchange
 
-import android.content.Context
-import android.net.Uri
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.hannesdorfmann.mosby3.mvi.MviFragment
+import com.jakewharton.rxbinding2.view.RxView
+import com.jakewharton.rxbinding2.widget.RxTextView
+import com.mihanjk.fintechCurrencyExchange.CurrencyApplication
 import com.mihanjk.fintechCurrencyExchange.R
+import com.mihanjk.fintechCurrencyExchange.model.database.CurrencyTransaction
+import io.reactivex.Observable
+import kotlinx.android.synthetic.main.fragment_currency_exchange.*
 import kotlinx.android.synthetic.main.fragment_currency_exchange.view.*
+import java.util.*
+import java.util.concurrent.TimeUnit
 
 
-/**
- * A simple [Fragment] subclass.
- * Activities that contain this fragment must implement the
- * [CurrencyExchangeFragment.OnFragmentInteractionListener] interface
- * to handle interaction events.
- * Use the [CurrencyExchangeFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
-class CurrencyExchangeFragment : Fragment() {
+class CurrencyExchangeFragment : CurrencyExchangeView,
+        MviFragment<CurrencyExchangeView, CurrencyExchangePresenter>() {
 
-    // TODO: Rename and change types of parameters
     private lateinit var mFirstCurrency: String
     private lateinit var mSecondCurrency: String
 
-    private var mListener: OnFragmentInteractionListener? = null
+    override fun createPresenter(): CurrencyExchangePresenter =
+            (activity.application as CurrencyApplication).component.getCurrencyExchangePresenter()
+
+    override fun initializeViewState(first: String, second: String): Observable<Pair<String, String>> =
+            Observable.just(Pair(first, second))
+
+    override fun modifyAmountFirstCurrencyIntent(): Observable<Double> =
+            RxTextView.textChanges(firstCurrencyEditText)
+                    .skipInitialValue()
+                    .debounce(500, TimeUnit.MILLISECONDS)
+                    .map { it.toString().toDouble() }
+
+    override fun modifyAmountSecondCurrencyIntent(): Observable<Double> =
+            RxTextView.textChanges(secondCurrencyEditText)
+                    .skipInitialValue()
+                    .debounce(500, TimeUnit.MILLISECONDS)
+                    .map { it.toString().toDouble() }
+
+    override fun getCurrencyCourseIntent(): Observable<Pair<String, String>> =
+            // TODO
+            Observable.just(Pair(mFirstCurrency, mSecondCurrency))
+
+    override fun makeCurrencyExchangeIntent(): Observable<CurrencyTransaction> =
+            RxView.clicks(exchangeButton).map {
+                CurrencyTransaction(null, mFirstCurrency,
+                        firstCurrencyEditText.text.toString().toDouble(),
+                        mSecondCurrency, secondCurrencyEditText.text.toString().toDouble(), Date())
+            }
+
+    override fun render(state: CurrencyExchangeViewState) {
+        // TODO
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,47 +66,10 @@ class CurrencyExchangeFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        // Inflate the layout for this fragment
         val view = inflater!!.inflate(R.layout.fragment_currency_exchange, container, false)
         view.firstCurrency.text = mFirstCurrency
         view.secondCurrency.text = mSecondCurrency
         return view
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    fun onButtonPressed(uri: Uri) {
-        if (mListener != null) {
-            mListener!!.onFragmentInteraction(uri)
-        }
-    }
-
-    override fun onAttach(context: Context?) {
-        super.onAttach(context)
-        if (context is OnFragmentInteractionListener) {
-            mListener = context
-        } else {
-            throw RuntimeException(context!!.toString() + " must implement OnFragmentInteractionListener")
-        }
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-        mListener = null
-    }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     *
-     *
-     * See the Android Training lesson [Communicating with Other Fragments](http://developer.android.com/training/basics/fragments/communicating.html) for more information.
-     */
-
-    interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        fun onFragmentInteraction(uri: Uri)
     }
 
     companion object {

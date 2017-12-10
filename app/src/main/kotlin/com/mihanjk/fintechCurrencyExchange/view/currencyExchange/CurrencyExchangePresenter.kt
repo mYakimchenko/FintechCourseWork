@@ -8,6 +8,7 @@ class CurrencyExchangePresenter @Inject constructor(
         mInteractor: CurrencyExchangeInteractor
 ) : MviBasePresenter<CurrencyExchangeView, CurrencyExchangeViewState>() {
     override fun bindIntents() {
-        TODO()
+        // TODO
+//        subscribeViewState()
     }
 }

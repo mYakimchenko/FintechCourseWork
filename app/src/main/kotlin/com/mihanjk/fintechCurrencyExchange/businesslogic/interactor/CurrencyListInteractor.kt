@@ -30,9 +30,7 @@ class CurrencyListInteractorImpl @Inject constructor(
                 (database + api.toCurrencyEntityList().filter {
                     val base = it.name
                     !database.any { it.name == base }
-                }).apply {
-                    forEachIndexed { index, entity -> entity.position = index }
-                }
+                })
             }
 
     /**

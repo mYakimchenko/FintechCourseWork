@@ -1,5 +1,6 @@
 package com.mihanjk.fintechCurrencyExchange.di
 
+import com.mihanjk.fintechCurrencyExchange.view.currencyExchange.CurrencyExchangePresenter
 import com.mihanjk.fintechCurrencyExchange.view.currencyList.CurrencyListFragment
 import com.mihanjk.fintechCurrencyExchange.view.currencyList.CurrencyListPresenter
 import com.mihanjk.fintechCurrencyExchange.view.mainActivity.MainActivity
@@ -16,4 +17,5 @@ interface AppComponent {
     fun getCurrencyListPresenter(): CurrencyListPresenter
     fun getMainPresenter(): MainPresenter
     fun getHistoryPresenter(): HistoryPresenter
+    fun getCurrencyExchangePresenter(): CurrencyExchangePresenter
 }

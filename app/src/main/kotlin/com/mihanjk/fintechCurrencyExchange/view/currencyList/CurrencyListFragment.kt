@@ -24,11 +24,11 @@ import kotlinx.android.synthetic.main.fragment_currency_list.view.*
 class CurrencyListFragment : CurrencyListView,
         MviFragment<CurrencyListView, CurrencyListPresenter>() {
 
-
     private lateinit var mAdapter: CurrencyListAdapter
     private val currencyExchangeSubject = PublishSubject.create<Boolean>()
+    private val cachingSubject = PublishSubject.create<List<CurrencyEntity>>()
 
-    override fun CurrencyExchangeOpened(): Observable<Boolean> = currencyExchangeSubject
+    override fun currencyExchangeOpened(): Observable<Boolean> = currencyExchangeSubject
 
     override fun createPresenter(): CurrencyListPresenter =
             (activity.application as CurrencyApplication).component.getCurrencyListPresenter()
@@ -49,12 +49,13 @@ class CurrencyListFragment : CurrencyListView,
             mAdapter.clickSubject
 
     override fun saveCurrencyListIntent(): Observable<List<CurrencyEntity>> =
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            cachingSubject
 
     override fun render(state: CurrencyListViewState) {
+        Log.d("Rx", "CurrencyListFragment state: $state")
         if (state.clickedCurrency != null) {
-            currencyExchangeSubject.onNext(true)
             openExchangeFragment(state.currencyCurrency, state.clickedCurrency)
+            currencyExchangeSubject.onNext(true)
         } else if (!state.loading && state.error == null) {
             renderData(state)
         } else if (state.loading) {
@@ -73,14 +74,16 @@ class CurrencyListFragment : CurrencyListView,
 
     fun renderData(state: CurrencyListViewState) {
         progressBar.visibility = View.GONE
+        swipeRefresh.isRefreshing = false
         state.currencyCurrency?.let { selectedCurrency.text = it }
-        // todo why i need mutable list?
-        mAdapter.mValues = state.data
+        // todo sort by database (not in the code)???
+        mAdapter.mValues = state.data.sortedWith(compareByDescending<CurrencyEntity> { it.isFavorite }.thenBy { it.lastUsed }.thenBy { it.name })
         mAdapter.notifyDataSetChanged()
     }
 
     fun renderLoading() {
         progressBar.visibility = View.VISIBLE
+        swipeRefresh.isRefreshing = false
     }
 
     fun renderError(message: String) {
@@ -92,45 +95,15 @@ class CurrencyListFragment : CurrencyListView,
         snackbar.show()
     }
 
-//    override fun onLongClicked(item: CurrencyEntity): CurrencyEntity? {
-//        selectedCurrency.text = getString(R.string.current_currency, item.name.toString())
-//        val previousCurrency = mSelectedCurrency
-//        mSelectedCurrency = item
-//        return previousCurrency
-//    }
-//
-//    override fun onClicked(name: Currency) {
-//        val fragment = fragmentManager.findFragmentByTag(MainActivity.CURRENCY_EXCHANGE)
-//        if (fragment == null) {
-//            var firstCurrency = mSelectedCurrency?.name
-//            if (firstCurrency == null) {
-//                val entity = mAdapter.mValues.sortedBy { it.position }.find { it.name != name && it.isFavorite }
-//                if (entity == null) {
-//                    firstCurrency = when (name) {
-//                        Currency.USD -> Currency.RUB
-//                        else -> Currency.USD
-//                    }
-//                }
-//            }
-//            fragment = CurrencyExchangeFragment.newInstance(firstCurrency, name)
-//        }
-//        // todo what i need to do, if fragment already exists
-//        fragmentManager.beginTransaction().replace(R.id.fragmentContainer,
-//                CurrencyExchangeFragment.newInstance(
-//                        mSelectedCurrency?.name ?:
-//                                mAdapter.mValues
-//                                        .sortedBy { it.isFavorite }
-//                                        .find { !it.name.equals(name) }
-//                                        .also { it == null }, name),
-//                MainActivity.CURRENCY_EXCHANGE)
-//                .addToBackStack(MainActivity.CURRENCY_EXCHANGE)
-//                .commit()
-//    }
-//
-//    override fun onStarImageClicked(item: CurrencyEntity) {
-//        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-//    }
+    override fun onPause() {
+        super.onPause()
+        cachingSubject.onNext(mAdapter.mValues)
+    }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        (activity as MainActivity).removeFromStack(this.tag)
+    }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -138,36 +111,9 @@ class CurrencyListFragment : CurrencyListView,
 
         val recycler = view.list
         recycler.addItemDecoration(DividerItemDecoration(context, LinearLayout.VERTICAL))
-        mAdapter = CurrencyListAdapter(ArrayList())
+        mAdapter = CurrencyListAdapter(emptyList())
         recycler.adapter = mAdapter
-//        mDatabase.currencyDao().getAllRecords()
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe({
-//                    mAdapter = CurrencyListAdapter(
-//                            if (it.isNotEmpty()) it.sortedBy { it.position }.toMutableList()
-//                            else Currency.values().mapIndexed { index, currency ->
-//                                CurrencyEntity(null, currency, false, index)
-//                            }.toMutableList(),
-//                            this@CurrencyListFragment)
-//                    recycler.adapter = mAdapter
-//                }, { e ->
-//                    val snackbar = Snackbar.make(activity.root_view, e.message.toString(), Snackbar.LENGTH_SHORT)
-//                    val layoutParams = snackbar.view.layoutParams as FrameLayout.LayoutParams
-//                    layoutParams.setMargins(0, 0, 0, activity.bottomNavigation.height)
-//                    snackbar.view.layoutParams = layoutParams
-//                    snackbar.show()
-//                })
         return view
     }
 
-
-//    override fun onPause() {
-//        super.onPause()
-//        mSelectedCurrency?.let { mAdapter.mValues.add(it.position, it) }
-//        mAdapter.mValues.forEachIndexed { index, entity -> entity.position = index }
-//        Completable.fromAction { mDatabase.currencyDao().insert(*(mAdapter.mValues.toTypedArray())) }
-//                .subscribeOn(Schedulers.io())
-//                .subscribe()
-//    }
 }
