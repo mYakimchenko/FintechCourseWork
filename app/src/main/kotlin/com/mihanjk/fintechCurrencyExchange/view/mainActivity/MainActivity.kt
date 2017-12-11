@@ -35,7 +35,7 @@ class MainActivity : MainView, MviActivity<MainView, MainPresenter>() {
             removeCurrencyExchangeSubject
 
     override fun openFragmentTab(): Observable<MainPartialState> =
-            RxBottomNavigationView.itemSelections(bottomNavigation).map {
+            RxBottomNavigationView.itemSelections(bottomNavigation).skip(1).map {
                 when (it.itemId) {
                     R.id.action_exchange -> (MainPartialState.openLastExchange)
                     R.id.action_history -> (MainPartialState.openLastHistoryFragment)
@@ -59,14 +59,17 @@ class MainActivity : MainView, MviActivity<MainView, MainPresenter>() {
             state.history -> openFragment(state.historyFragments.last)
         // todo how can i do null safe call of this method in this case?
             state.analysis -> openFragment(state.analysisFragment ?: AnalysisFragment())
-            else -> throw IllegalStateException("Can't process this state: $state")
+            else -> {
+                bottomNavigation.selectedItemId = R.id.action_exchange
+            }
+//            else -> throw IllegalStateException("Can't process this state: $state")
         }
     }
 
     private fun openFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
                 .replace(R.id.fragmentContainer, fragment)
-                .addToBackStack(fragment.tag)
+                .addToBackStack(null)
                 .commit()
     }
 
@@ -78,8 +81,6 @@ class MainActivity : MainView, MviActivity<MainView, MainPresenter>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-
         bottomNavigation.selectedItemId = R.id.action_exchange
     }
 

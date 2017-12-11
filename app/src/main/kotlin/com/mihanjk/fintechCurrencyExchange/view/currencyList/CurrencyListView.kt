@@ -6,13 +6,13 @@ import io.reactivex.Observable
 
 
 interface CurrencyListView : MvpView {
-    fun loadCurrencyListIntent(): Observable<Boolean>
-    fun refreshCurrencyListIntent(): Observable<Boolean>
+    fun loadCachedDataThenNetwork(): Observable<Boolean>
+    fun loadNetworkData(): Observable<Any>
     fun toggleFavoriteIntent(): Observable<CurrencyEntity>
     fun changeCurrentCurrencyIntent(): Observable<CurrencyEntity>
-    fun makeCurrencyExchange(): Observable<CurrencyEntity>
+    fun openCurrencyExchangeScreen(): Observable<CurrencyEntity>
     fun currencyExchangeOpened(): Observable<Boolean>
-    fun saveCurrencyListIntent(): Observable<List<CurrencyEntity>>
+    fun saveDataIntent(): Observable<List<CurrencyEntity>>
 
     fun render(state: CurrencyListViewState)
 }

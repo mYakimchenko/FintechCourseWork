@@ -8,7 +8,7 @@ class HistoryPresenter @Inject constructor(
         val mInteractor: HistoryInteractor
 ) : MviBasePresenter<HistoryView, HistoryViewState>() {
     override fun bindIntents() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+//        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }
 

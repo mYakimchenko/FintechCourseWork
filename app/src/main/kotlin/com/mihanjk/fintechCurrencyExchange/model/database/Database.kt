@@ -15,6 +15,9 @@ interface CurrencyDao {
     @Update
     fun update(vararg currencyEntity: CurrencyEntity)
 
+    @Update
+    fun update(currencyList: List<CurrencyEntity>)
+
     @Query("SELECT * FROM currency")
     fun getAllRecords(): Flowable<List<CurrencyEntity>>
 }

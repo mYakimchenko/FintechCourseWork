@@ -1,6 +1,7 @@
 package com.mihanjk.fintechCurrencyExchange
 
 import android.util.Log
+import com.mihanjk.fintechCurrencyExchange.model.database.CurrencyEntity
 import io.reactivex.Observable
 
 fun <T> Observable<T>.log(tag: String = "Rx") =
@@ -11,3 +12,7 @@ fun <T> Observable<T>.log(tag: String = "Rx") =
             doOnSubscribe { Log.d(tag, "OnSubscribe: $this") }
             doOnDispose { Log.d(tag, "OnDispose: $this") }
         }
+
+fun List<CurrencyEntity>.sortByFavoriteLastUsedAndName() {
+
+}

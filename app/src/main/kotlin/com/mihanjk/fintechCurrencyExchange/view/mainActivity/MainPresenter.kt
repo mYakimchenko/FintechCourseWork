@@ -46,10 +46,17 @@ class MainPresenter : MviBasePresenter<MainView, MainViewState>() {
                         analysis = false, exchange = false, historyFragments =
                 previous.historyFragments.apply { pollLast() })
 
-                is MainPartialState.removeFragmentFromStack -> previous.copy(exchange = true,
-                        analysis = false, history = false, historyFragments =
-                previous.historyFragments.apply {
-                    remove(find { it?.tag == changes.tag })
-                })
+                is MainPartialState.removeFragmentFromStack -> when (changes.tag) {
+                    CurrencyListFragment.TAG -> previous.copy(exchange = true, history = false,
+                            analysis = true, historyFragments = previous.exchangeFragments.apply {
+                        remove(find { it?.tag == changes.tag })
+                    })
+                    else -> throw IllegalStateException("Unknown fragment TAG")
+                }
+//                    previous.copy(exchange = true,
+//                            analysis = false, history = false, historyFragments =
+//                    previous.historyFragments.apply {
+//                        remove(find { it?.TAG == changes.TAG })
+//                    })
             }
 }

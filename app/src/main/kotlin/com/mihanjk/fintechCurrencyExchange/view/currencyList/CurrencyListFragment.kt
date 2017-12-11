@@ -24,6 +24,10 @@ import kotlinx.android.synthetic.main.fragment_currency_list.view.*
 class CurrencyListFragment : CurrencyListView,
         MviFragment<CurrencyListView, CurrencyListPresenter>() {
 
+    companion object {
+        const val TAG = "CurrencyList"
+    }
+
     private lateinit var mAdapter: CurrencyListAdapter
     private val currencyExchangeSubject = PublishSubject.create<Boolean>()
     private val cachingSubject = PublishSubject.create<List<CurrencyEntity>>()
@@ -33,11 +37,11 @@ class CurrencyListFragment : CurrencyListView,
     override fun createPresenter(): CurrencyListPresenter =
             (activity.application as CurrencyApplication).component.getCurrencyListPresenter()
 
-    override fun loadCurrencyListIntent(): Observable<Boolean> =
+    override fun loadCachedDataThenNetwork(): Observable<Boolean> =
             Observable.just(true)
 
-    override fun refreshCurrencyListIntent(): Observable<Boolean> =
-            RxSwipeRefreshLayout.refreshes(swipeRefresh).map { true }
+    override fun loadNetworkData(): Observable<Any> =
+            RxSwipeRefreshLayout.refreshes(swipeRefresh)
 
     override fun toggleFavoriteIntent(): Observable<CurrencyEntity> =
             mAdapter.starClickSubject
@@ -45,16 +49,16 @@ class CurrencyListFragment : CurrencyListView,
     override fun changeCurrentCurrencyIntent(): Observable<CurrencyEntity> =
             mAdapter.longClickSubject
 
-    override fun makeCurrencyExchange(): Observable<CurrencyEntity> =
+    override fun openCurrencyExchangeScreen(): Observable<CurrencyEntity> =
             mAdapter.clickSubject
 
-    override fun saveCurrencyListIntent(): Observable<List<CurrencyEntity>> =
+    override fun saveDataIntent(): Observable<List<CurrencyEntity>> =
             cachingSubject
 
     override fun render(state: CurrencyListViewState) {
         Log.d("Rx", "CurrencyListFragment state: $state")
         if (state.clickedCurrency != null) {
-            openExchangeFragment(state.currencyCurrency, state.clickedCurrency)
+            openExchangeFragment(state.currentCurrency?.name, state.clickedCurrency)
             currencyExchangeSubject.onNext(true)
         } else if (!state.loading && state.error == null) {
             renderData(state)
@@ -63,6 +67,8 @@ class CurrencyListFragment : CurrencyListView,
         } else if (state.error != null) {
             Log.d("Error", "Some error happened: ", state.error)
             renderError(state.error.localizedMessage ?: "Unknown error")
+        } else if (state.updating) {
+            renderUpdate()
         } else {
             throw IllegalStateException("Unknown view state $state")
         }
@@ -75,10 +81,8 @@ class CurrencyListFragment : CurrencyListView,
     fun renderData(state: CurrencyListViewState) {
         progressBar.visibility = View.GONE
         swipeRefresh.isRefreshing = false
-        state.currencyCurrency?.let { selectedCurrency.text = it }
-        // todo sort by database (not in the code)???
-        mAdapter.mValues = state.data.sortedWith(compareByDescending<CurrencyEntity> { it.isFavorite }.thenBy { it.lastUsed }.thenBy { it.name })
-        mAdapter.notifyDataSetChanged()
+        state.currentCurrency?.let { selectedCurrency.text = it.name }
+        mAdapter.updateValues(state.data)
     }
 
     fun renderLoading() {
@@ -86,8 +90,14 @@ class CurrencyListFragment : CurrencyListView,
         swipeRefresh.isRefreshing = false
     }
 
+    fun renderUpdate() {
+        progressBar.visibility = View.GONE
+        swipeRefresh.isRefreshing = true
+    }
+
     fun renderError(message: String) {
         progressBar.visibility = View.GONE
+        swipeRefresh.isRefreshing = false
         val snackbar = Snackbar.make(activity.root_view, message, Snackbar.LENGTH_LONG)
         val layoutParams = snackbar.view.layoutParams as FrameLayout.LayoutParams
         layoutParams.setMargins(0, 0, 0, activity.bottomNavigation.height)
@@ -102,7 +112,7 @@ class CurrencyListFragment : CurrencyListView,
 
     override fun onDestroy() {
         super.onDestroy()
-        (activity as MainActivity).removeFromStack(this.tag)
+        (activity as MainActivity).removeFromStack(TAG)
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,

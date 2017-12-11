@@ -1,5 +1,6 @@
 package com.mihanjk.fintechCurrencyExchange.view.currencyList
 
+import android.support.v7.util.DiffUtil
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -7,17 +8,21 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import com.jakewharton.rxbinding2.view.RxView
+import com.jakewharton.rxrelay2.PublishRelay
 import com.mihanjk.fintechCurrencyExchange.R
 import com.mihanjk.fintechCurrencyExchange.model.database.CurrencyEntity
-import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.fragment_currency_item.view.*
 
 class CurrencyListAdapter(var mValues: List<CurrencyEntity>) :
         RecyclerView.Adapter<CurrencyListAdapter.ViewHolder>() {
 
-    val starClickSubject = PublishSubject.create<CurrencyEntity>()
-    val clickSubject = PublishSubject.create<CurrencyEntity>()
-    val longClickSubject = PublishSubject.create<CurrencyEntity>()
+    companion object {
+        const val KEY_FAVORITE = "Favorite"
+    }
+
+    val starClickSubject = PublishRelay.create<CurrencyEntity>()
+    val clickSubject = PublishRelay.create<CurrencyEntity>()
+    val longClickSubject = PublishRelay.create<CurrencyEntity>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -31,30 +36,18 @@ class CurrencyListAdapter(var mValues: List<CurrencyEntity>) :
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(mValues[position])
+    }
 
-//        RxView.clicks(holder.mStarImage).subscribe {
-//            holder.mItem.isFavorite = !holder.mItem.isFavorite
-////            mListener.onStarImageClicked(holder.mItem)
-//            holder.mStarImage.setImageResource(if (holder.mItem.isFavorite)
-//                R.drawable.ic_star_yellow_24dp else R.drawable.ic_star_border_black_24dp)
-//            notifyItemChanged(position)
-//            mValues.removeAt(position)
-//            val index = mValues.indexOfLast { it.isFavorite }
-//                    .let { if (it == -1) 0 else it + 1 }
-//            mValues.add(index, holder.mItem)
-//            holder.mItem.position = index
-//            notifyItemMoved(position, holder.mItem.position)
-//            notifyDataSetChanged()
-//        }
-//
-//        RxView.longClicks(holder.mView).subscribe {
-//            mValues.removeAt(position)
-//            notifyDataSetChanged()
-//            mListener.onLongClicked(holder.mItem)?.let { mValues.add(it.position, it) }
-//        }
-//
-//        RxView.clicks(holder.mView).subscribe {
-//            mListener.onClicked(holder.mItem)
+    fun updateValues(values: List<CurrencyEntity>) {
+        mValues = values
+        notifyDataSetChanged()
+//        // todo do i need to reassign mValues?
+//        val sorted = values.sortedWith(compareByDescending<CurrencyEntity> { it.isFavorite }
+//                    .thenBy { it.lastUsed }
+//                    .thenBy { it.name })
+//        DiffUtil.calculateDiff(CurrencyDiffCallback(mValues, sorted)).also {
+//            mValues = sorted
+//            it.dispatchUpdatesTo(this)
 //        }
     }
 
@@ -74,4 +67,17 @@ class CurrencyListAdapter(var mValues: List<CurrencyEntity>) :
                 R.drawable.ic_star_yellow_24dp else R.drawable.ic_star_border_black_24dp)
         }
     }
+}
+
+class CurrencyDiffCallback(val old: List<CurrencyEntity>, val new: List<CurrencyEntity>) : DiffUtil.Callback() {
+    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
+            old[oldItemPosition].name == new[newItemPosition].name
+
+    override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
+            old[oldItemPosition] == new[newItemPosition]
+
+    override fun getOldListSize(): Int = old.size
+
+    override fun getNewListSize(): Int = new.size
+    // todo do i need use payloads???
 }
